@@ -64,7 +64,7 @@ print(f'bert_large_token_embeddings shape: {bert_large_token_embeddings.shape}')
 
 输入文本逐层通过 self-attention 机制和前馈神经网络进行处理和转换，每个词本身的 embedding 始终作为主要语义基向量，同时其他词的语义通过注意力权重加权补充，形成更丰富的向量表征。经过多层迭代，每个词的最终 embedding 实质上是全局语义的深度整合。
 
-`[CLS]`作为无实际语义的占位符，每层注意力计算中，它不携带初始语义信息，仅作为信息聚合节点接收来自全体词汇的加权特征。经过多层传递后，`[CLS]`最终形成全局语义的压缩表征，相比携带自身语义干扰的常规词汇，可以更好的表征文本语义。
+`[CLS]`作为无实际语义的占位符，每层注意力计算中，它不携带初始语义信息，仅作为信息聚合节点接收来自全体词汇的加权特征。经过多层传递后，`[CLS]`最终形成全局语义的压缩表征，相比携带自身语义干扰的常规词汇，可以更好的表示文本语义。
 
 ![img](./images/bert-encoders-input.png)
 
@@ -95,7 +95,7 @@ BERT模型的最大输入长度通常为512个 token，这是由其预训练时�
 
 
 
-代码如下：
+测试代码如下：
 
 ```python
 from transformers import BertTokenizer, BertModel
@@ -253,7 +253,7 @@ for item in tokenized_datasets["train"]:
 
 BERT 原生支持双句输入（通过 `[SEP]` 分隔），其预训练任务包含 NSP （Next Sentence Prediction），因此天然适合文本蕴含、语义相似度等任务。
 
-漏洞数据中有两项可以用于判断其漏洞类别，即漏洞报告标题和报告内容，这两项可以拼接为一段文本作为输入，但我觉得标题通常包含一些重要关键词，可以提供分类的核心线索，利用 BERT 的双句机制，模型能区分标题与内容，并通过注意力机制捕捉交互信息，所以在前文代码中我没有对标题和内容进行拼接，而是双句输入。
+漏洞数据中有两项可以用于判断其漏洞类别，即漏洞报告标题和报告内容，这两项可以拼接为一段文本作为输入，但我觉得标题通常包含一些重要关键词，可以提供分类的核心线索，利用 BERT 的双句机制，模型能区分标题与内容，所以在前文代码中我没有对标题和内容进行拼接，而是双句输入。
 
 
 
@@ -522,7 +522,7 @@ model.eval()
 
 
 
-Accuracy 是分类问题中最常用的指标（正确的预测数与总预测数的比值），但对于不平衡的数据集而言，它并不是一个好的指标（参考 https://zhuanlan.zhihu.com/p/147663370）。所以我又用了 F1-score 和混淆矩阵来评估模型：
+Accuracy 是分类问题中最常用的指标（正确的预测数与总预测数的比值），但对于不平衡的数据集而言，它并不是一个好的指标（参考 https://zhuanlan.zhihu.com/p/147663370 ）。所以我又用了 F1-score 和混淆矩阵来评估模型：
 
 ```python
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
@@ -742,7 +742,7 @@ def train(lr, epochs, model, train_dataloader, validation_dataloader):
 
 ![image-20250218194046547](./images/image-20250218194046547.png)
 
-看起来测试集中缺少了部分漏洞类型，另外从混淆矩阵中可以看出漏洞分类其实还是有点不合理，比如有16个 `Configuration and Design Issues` 被分为了 `Information Disclosure` ，这两种确实会有交错重叠，或许漏洞分类本身就应该是个多标签分类任务。
+看起来测试集中缺少了部分漏洞类型，另外从混淆矩阵中可以看出漏洞分类其实还是有点不合理，比如有16个 `Configuration and Design Issues` 被分为了 `Information Disclosure` ，这两种确实会有交错重叠，或许漏洞分类本就应该是个多标签分类任务。
 
 
 
